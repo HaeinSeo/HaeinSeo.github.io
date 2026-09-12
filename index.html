@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Haein Seo — Computer Vision &amp; Multimodal Learning</title>
+<meta name="description" content="Haein Seo is an undergraduate researcher in Data Science at Duksung Women's University, working on computer vision, 3D scene understanding, and multimodal vision–language learning at the DMKD Lab.">
+<meta name="author" content="Haein Seo">
+<meta name="theme-color" content="#0b0b0a">
+
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Haein Seo — Computer Vision &amp; Multimodal Learning">
+<meta property="og:description" content="Undergraduate researcher in Data Science at Duksung Women's University. Computer vision, 3D scene understanding, and multimodal vision–language learning.">
+<meta property="og:image" content="assets/profile.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+<style>
+/* ============================================================
+   FONT — NEXON Lv1 Gothic
+   ============================================================ */
+@font-face{
+  font-family:'NexonLv1Gothic';
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv1 Gothic OTF Light.woff') format('woff');
+  font-weight:300;font-display:swap;
+}
+@font-face{
+  font-family:'NexonLv1Gothic';
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv1 Gothic OTF.woff') format('woff');
+  font-weight:normal;font-display:swap;
+}
+@font-face{
+  font-family:'NexonLv1Gothic';
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv1 Gothic OTF Bold.woff') format('woff');
+  font-weight:700;font-display:swap;
+}
+
+/* ============================================================
+   TOKENS — black / gold / white
+   ============================================================ */
+:root{
+  --ff:'NexonLv1Gothic', -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+
+  --bg:#fbfaf7;
+  --bg-raised:#ffffff;
+  --bg-deep:#0e0e0c;
+  --ink:#12120f;
+  --ink-soft:#4b4941;
+  --ink-mute:#8d887d;
+  --rule:#e8e3d8;
+  --rule-soft:#f0ece3;
+
+  --gold:#8d7134;        /* text-safe gold */
+  --gold-bright:#b8973f; /* lines, marks */
+  --gold-glow:#e7d9b4;   /* washes */
+  --gold-tint:#f7f2e6;
+
+  --shadow-sm:0 1px 2px rgba(18,18,15,.04);
+  --shadow-lg:0 2px 6px rgba(18,18,15,.05), 0 30px 60px -34px rgba(18,18,15,.4);
+
+  --maxw:1120px;
+  --pad:clamp(20px, 5vw, 40px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0b0a;
+    --bg-raised:#131311;
+    --bg-deep:#060605;
+    --ink:#f6f3ec;
+    --ink-soft:#c7c1b4;
+    --ink-mute:#8c877c;
+    --rule:#262520;
+    --rule-soft:#1c1b18;
+    --gold:#d9bb7c;
+    --gold-bright:#c3a35c;
+    --gold-glow:#3a3120;
+    --gold-tint:#17150f;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.4), 0 30px 60px -34px rgba(0,0,0,.9);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0b0a;
+  --bg-raised:#131311;
+  --bg-deep:#060605;
+  --ink:#f6f3ec;
+  --ink-soft:#c7c1b4;
+  --ink-mute:#8c877c;
+  --rule:#262520;
+  --rule-soft:#1c1b18;
+  --gold:#d9bb7c;
+  --gold-bright:#c3a35c;
+  --gold-glow:#3a3120;
+  --gold-tint:#17150f;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  --shadow-lg:0 2px 6px rgba(0,0,0,.4), 0 30px 60px -34px rgba(0,0,0,.9);
+  color-scheme:dark;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--ff);
+  font-weight:300;
+  font-size:16px;
+  line-height:1.75;
+  letter-spacing:.005em;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+h1,h2,h3,h4{font-weight:400;margin:0;letter-spacing:-.01em;line-height:1.25}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+
+.wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--pad)}
+.rule-gold{
+  height:1px;border:0;margin:0;
+  background:linear-gradient(90deg, var(--gold-bright), transparent 72%);
+}
+.label{
+  font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--gold);font-weight:400;
+}
+::selection{background:var(--gold-glow);color:var(--ink)}
+:focus-visible{outline:1.5px solid var(--gold-bright);outline-offset:3px;border-radius:2px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:var(--pad);top:12px;z-index:200;background:var(--ink);color:var(--bg);padding:10px 16px}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.topbar{
+  position:sticky;top:0;z-index:90;
+  background:color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter:saturate(1.3) blur(14px);
+  -webkit-backdrop-filter:saturate(1.3) blur(14px);
+  border-bottom:1px solid transparent;
+  transition:border-color .35s ease, background .35s ease;
+}
+.topbar.is-stuck{border-bottom-color:var(--rule)}
+.topbar .wrap{display:flex;align-items:center;gap:16px;min-height:66px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;flex:0 1 auto;min-width:0}
+.brand img{width:30px;height:30px;flex:0 0 auto}
+.brand b{
+  font-weight:400;font-size:clamp(.95rem,2.6vw,1.06rem);
+  letter-spacing:.13em;text-transform:uppercase;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.nav{display:flex;align-items:center;gap:2px;margin-left:auto}
+.nav a{
+  text-decoration:none;color:var(--ink-mute);
+  font-size:.73rem;letter-spacing:.17em;text-transform:uppercase;
+  padding:9px 12px;position:relative;transition:color .25s;white-space:nowrap;
+}
+.nav a::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:4px;height:1px;
+  background:var(--gold-bright);transform:scaleX(0);transform-origin:left;
+  transition:transform .35s cubic-bezier(.22,.7,.3,1);
+}
+.nav a:hover{color:var(--ink)}
+.nav a:hover::after,.nav a.active::after{transform:scaleX(1)}
+.nav a.active{color:var(--gold)}
+
+.icon-btn{
+  border:1px solid var(--rule);background:transparent;color:var(--ink-mute);
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  display:grid;place-items:center;flex:0 0 auto;
+  transition:color .25s,border-color .25s;padding:0;
+}
+.icon-btn:hover{color:var(--gold);border-color:var(--gold-bright)}
+.icon-btn svg{width:16px;height:16px}
+#themeBtn{margin-left:10px}
+#menuBtn{display:none;margin-left:8px}
+
+.icon-sun{display:none}
+:root[data-theme="dark"] .icon-sun{display:block}
+:root[data-theme="dark"] .icon-moon{display:none}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .icon-sun{display:block}
+  :root:not([data-theme="light"]) .icon-moon{display:none}
+}
+:root[data-theme="light"] .icon-sun{display:none}
+:root[data-theme="light"] .icon-moon{display:block}
+
+/* mobile drawer */
+.drawer{
+  position:fixed;inset:0;z-index:100;background:var(--bg);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 var(--pad);
+  opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s;
+}
+.drawer.open{opacity:1;visibility:visible}
+.drawer a{
+  text-decoration:none;color:var(--ink);
+  font-size:clamp(1.35rem,6.5vw,1.9rem);letter-spacing:.06em;
+  padding:16px 0;border-bottom:1px solid var(--rule-soft);
+  display:flex;align-items:baseline;gap:14px;
+}
+.drawer a i{font-style:normal;font-size:.7rem;color:var(--gold);letter-spacing:.2em}
+.drawer .close{
+  position:absolute;top:14px;right:var(--pad);
+  width:44px;height:44px;border:1px solid var(--rule);border-radius:50%;
+  background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center;
+}
+.drawer .close svg{width:18px;height:18px}
+body.locked{overflow:hidden}
+
+@media (max-width:900px){
+  .nav a{display:none}
+  #menuBtn{display:grid}
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{position:relative;padding-block:clamp(44px,8vw,96px) clamp(36px,6vw,72px);overflow:hidden}
+.hero::before{
+  content:"";position:absolute;top:-30%;right:-10%;width:60vw;height:60vw;max-width:720px;max-height:720px;
+  background:radial-gradient(circle, var(--gold-glow) 0%, transparent 68%);
+  opacity:.5;pointer-events:none;z-index:0;
+}
+.hero .wrap{position:relative;z-index:1}
+.hero-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) clamp(220px,26vw,340px);
+  gap:clamp(28px,5vw,68px);
+  align-items:center;
+}
+.eyebrow{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.eyebrow .line{height:1px;width:clamp(28px,7vw,64px);background:var(--gold-bright);flex:0 0 auto}
+h1{
+  font-weight:300;
+  font-size:clamp(2.5rem,8.5vw,4.5rem);
+  line-height:1.06;letter-spacing:.01em;
+  margin-bottom:10px;
+}
+h1 .thin{font-weight:300}
+h1 .strong{font-weight:400}
+.hangul{
+  color:var(--ink-mute);font-weight:300;
+  font-size:clamp(.92rem,3vw,1.08rem);letter-spacing:.42em;
+  margin-bottom:28px;
+}
+.lede{
+  font-size:clamp(1.05rem,2.6vw,1.32rem);line-height:1.7;font-weight:300;
+  color:var(--ink-soft);max-width:30ch;margin-bottom:20px;
+  text-wrap:pretty;
+}
+.lede b{font-weight:400;color:var(--ink);position:relative;white-space:nowrap}
+.lede b::after{
+  content:"";position:absolute;left:0;right:0;bottom:.06em;height:1px;background:var(--gold-bright);opacity:.6;
+}
+.sub{
+  color:var(--ink-mute);font-size:clamp(.9rem,2.2vw,.97rem);line-height:1.85;
+  max-width:46ch;margin-bottom:32px;text-wrap:pretty;
+}
+.sub b{color:var(--ink-soft);font-weight:400}
+
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.lnk{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  border:1px solid var(--rule);padding:10px 17px;
+  font-size:.82rem;font-weight:300;letter-spacing:.06em;color:var(--ink-soft);
+  background:var(--bg-raised);
+  transition:border-color .3s,color .3s,transform .3s,box-shadow .3s,background .3s;
+}
+.lnk:hover{color:var(--gold);border-color:var(--gold-bright);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.lnk svg{width:15px;height:15px;flex:0 0 auto}
+.lnk.primary{
+  background:var(--ink);border-color:var(--ink);color:var(--bg-raised);font-weight:400;
+}
+.lnk.primary:hover{background:var(--gold);border-color:var(--gold);color:#fff;transform:translateY(-2px)}
+:root[data-theme="dark"] .lnk.primary:hover{color:#0b0b0a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lnk.primary:hover{color:#0b0b0a}}
+
+/* portrait — never distorts */
+.portrait{position:relative;width:100%;max-width:340px}
+.portrait .frame{
+  position:absolute;inset:16px -16px -16px 16px;
+  border:1px solid var(--gold-bright);opacity:.55;pointer-events:none;
+}
+.portrait img{
+  position:relative;z-index:1;
+  width:100%;height:auto;
+  aspect-ratio:1281/1479;
+  object-fit:cover;object-position:50% 22%;
+  box-shadow:var(--shadow-lg);
+  filter:saturate(.94) contrast(1.03);
+}
+
+@media (max-width:880px){
+  .hero-grid{grid-template-columns:1fr;gap:clamp(30px,7vw,44px);align-items:start}
+  .hero-copy{order:1}
+  .portrait{order:2;max-width:min(calc(100% - 14px),440px);margin-inline:auto}
+  .portrait .frame{inset:12px -12px -12px 12px}
+  .lede,.sub{max-width:none}
+}
+@media (max-width:560px){
+  .links{gap:8px}
+  .lnk{padding:9px 14px;font-size:.78rem}
+}
+
+/* ============================================================
+   STAT STRIP
+   ============================================================ */
+.strip{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+}
+.strip > div{padding:26px 22px;border-left:1px solid var(--rule-soft);min-width:0}
+.strip > div:first-child{border-left:0;padding-left:0}
+.strip dt{
+  font-weight:300;font-size:clamp(1.5rem,4.5vw,2.1rem);line-height:1;
+  color:var(--gold);margin-bottom:10px;letter-spacing:.02em;
+}
+.strip dt sup{font-size:.45em;vertical-align:.9em;letter-spacing:.05em}
+.strip dd{
+  margin:0;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-mute);line-height:1.7;
+}
+@media (max-width:820px){
+  .strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .strip > div{padding:20px 18px}
+  .strip > div:nth-child(odd){border-left:0;padding-left:0}
+  .strip > div:nth-child(n+3){border-top:1px solid var(--rule-soft)}
+}
+@media (max-width:400px){
+  .strip dd{font-size:.64rem;letter-spacing:.12em}
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{padding-block:clamp(54px,8vw,96px);border-top:1px solid var(--rule-soft)}
+.sec-head{margin-bottom:clamp(28px,4vw,44px)}
+.sec-head .label{display:block;margin-bottom:12px}
+h2{
+  font-weight:300;font-size:clamp(1.6rem,5vw,2.3rem);
+  letter-spacing:.01em;line-height:1.2;
+}
+h2 .accent{color:var(--gold)}
+
+/* research cards */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--rule-soft);border:1px solid var(--rule-soft)}
+.card{background:var(--bg);padding:clamp(24px,3.2vw,34px);transition:background .35s;min-width:0}
+.card:hover{background:var(--gold-tint)}
+.card .rn{display:block;font-size:.72rem;letter-spacing:.24em;color:var(--gold);margin-bottom:18px}
+.card h3{font-weight:400;font-size:clamp(1.1rem,2.6vw,1.26rem);letter-spacing:.005em;line-height:1.4;margin-bottom:12px}
+.card p{font-size:.9rem;color:var(--ink-mute);line-height:1.8;text-wrap:pretty}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.tag{font-size:.68rem;letter-spacing:.1em;color:var(--ink-mute);border:1px solid var(--rule);padding:4px 9px;white-space:nowrap}
+@media (max-width:880px){.cards{grid-template-columns:1fr}}
+
+/* publications */
+.pub-group{margin-bottom:clamp(30px,4vw,46px)}
+.pub-group:last-child{margin-bottom:0}
+.pub-label{
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);
+  padding-bottom:12px;border-bottom:1px solid var(--rule);
+}
+.pub{
+  display:grid;grid-template-columns:44px minmax(0,1fr);gap:18px;
+  padding:22px 0;border-bottom:1px solid var(--rule-soft);align-items:start;
+}
+.pub:last-child{border-bottom:0}
+.pub-idx{color:var(--gold);font-size:.78rem;letter-spacing:.14em;padding-top:6px}
+.pub-title{
+  font-weight:400;font-size:clamp(1rem,2.5vw,1.13rem);line-height:1.55;
+  margin-bottom:9px;overflow-wrap:anywhere;text-wrap:pretty;
+}
+.pub-meta{font-size:.86rem;color:var(--ink-mute);line-height:1.75;overflow-wrap:anywhere}
+.pub-meta .venue{color:var(--ink-soft)}
+.au-me{color:var(--ink);font-weight:400;border-bottom:1px solid var(--gold-bright)}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.badge{
+  font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);border:1px solid var(--gold-bright);padding:4px 9px;white-space:nowrap;
+}
+.badge.plain{color:var(--ink-mute);border-color:var(--rule);text-transform:none;letter-spacing:.06em;font-size:.7rem}
+.pub-meta a{color:var(--gold);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .25s}
+.pub-meta a:hover{border-bottom-color:var(--gold)}
+@media (max-width:560px){
+  .pub{grid-template-columns:1fr;gap:8px}
+  .pub-idx{padding-top:0}
+}
+
+/* experience */
+.xp{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr);gap:clamp(22px,4vw,52px)}
+.xp-side .org{font-size:clamp(1.15rem,3vw,1.3rem);font-weight:400;margin-bottom:8px;line-height:1.35}
+.xp-side .role{font-size:.9rem;color:var(--ink-soft);margin-bottom:6px}
+.xp-side .when{font-size:.8rem;color:var(--ink-mute);letter-spacing:.06em}
+.xp-item{padding:0 0 26px 24px;border-left:1px solid var(--rule);position:relative;min-width:0}
+.xp-item:last-child{padding-bottom:0}
+.xp-item::before{
+  content:"";position:absolute;left:-3.5px;top:9px;width:7px;height:7px;
+  background:var(--gold-bright);transform:rotate(45deg);
+}
+.xp-item h3{font-size:.98rem;font-weight:400;margin-bottom:9px;line-height:1.5}
+.xp-item h3 em{font-style:normal;color:var(--gold);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase}
+.xp-item p{font-size:.9rem;color:var(--ink-mute);line-height:1.85;max-width:58ch;text-wrap:pretty}
+@media (max-width:820px){
+  .xp{grid-template-columns:1fr;gap:26px}
+  .xp-side{padding-bottom:6px;border-bottom:1px solid var(--rule-soft)}
+}
+
+/* award / activity lists */
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(30px,5vw,60px)}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.col-title{
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);
+  padding-bottom:12px;border-bottom:1px solid var(--rule);
+}
+.list li{
+  padding:16px 0;border-bottom:1px solid var(--rule-soft);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:baseline;
+}
+.list li:last-child{border-bottom:0}
+.list .what{font-size:.93rem;color:var(--ink);line-height:1.6;min-width:0}
+.list .who{display:block;font-size:.81rem;color:var(--ink-mute);margin-top:4px;line-height:1.6}
+.list .yr{font-size:.8rem;color:var(--gold);letter-spacing:.1em;white-space:nowrap}
+@media (max-width:460px){
+  .list li{grid-template-columns:1fr}
+  .list .yr{order:-1;font-size:.72rem}
+}
+
+/* skills */
+.skills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(30px,5vw,60px)}
+.skill-row{padding:20px 0;border-bottom:1px solid var(--rule-soft);min-width:0}
+.skill-row h3{
+  font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  font-weight:400;margin-bottom:11px;
+}
+.skill-row p{font-size:.9rem;color:var(--ink-soft);line-height:1.85;text-wrap:pretty}
+.coursework{margin-top:28px;font-size:.86rem;color:var(--ink-mute);line-height:1.85;text-wrap:pretty}
+@media (max-width:820px){.skills{grid-template-columns:1fr}}
+
+/* contact */
+.contact{background:var(--bg-deep);border-top:0;color:#f6f3ec;position:relative;overflow:hidden}
+.contact::before{
+  content:"";position:absolute;bottom:-40%;left:-10%;width:70vw;height:70vw;max-width:760px;max-height:760px;
+  background:radial-gradient(circle, rgba(184,151,63,.16) 0%, transparent 66%);pointer-events:none;
+}
+.contact .wrap{position:relative;z-index:1}
+.contact .label{color:#c3a35c}
+.contact h2{color:#f6f3ec}
+.contact-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(30px,5vw,56px);align-items:center}
+.contact p.say{color:#a8a294;font-size:clamp(.92rem,2.3vw,1rem);line-height:1.9;max-width:44ch;margin:14px 0 28px;text-wrap:pretty}
+.mail{
+  display:inline-block;color:#f6f3ec;text-decoration:none;
+  font-size:clamp(1.05rem,4.2vw,1.7rem);letter-spacing:.02em;font-weight:300;
+  border-bottom:1px solid rgba(195,163,92,.5);padding-bottom:6px;
+  transition:color .3s,border-color .3s;overflow-wrap:anywhere;
+}
+.mail:hover{color:#d9bb7c;border-bottom-color:#d9bb7c}
+.contact .links{margin-top:32px}
+.contact .lnk{background:transparent;border-color:#2c2b26;color:#a8a294}
+.contact .lnk:hover{color:#d9bb7c;border-color:#c3a35c;box-shadow:none}
+.mascot{width:clamp(90px,18vw,140px);height:auto;opacity:.95;justify-self:center}
+@media (max-width:700px){
+  .contact-grid{grid-template-columns:1fr;gap:26px}
+  .mascot{justify-self:start;order:-1}
+}
+
+/* footer */
+footer{background:var(--bg-deep);padding-block:24px 34px;border-top:1px solid #1c1b18}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+footer p{font-size:.76rem;color:#6f6a5f;letter-spacing:.08em}
+.to-top{font-size:.72rem;color:#6f6a5f;text-decoration:none;letter-spacing:.18em;text-transform:uppercase;transition:color .3s}
+.to-top:hover{color:#c3a35c}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+</style>
+<noscript><style>.rv{opacity:1;transform:none}</style></noscript>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar" id="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/icon-192.png" alt="" width="30" height="30"><b>Haein Seo</b></a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#research">Research</a>
+      <a href="#publications">Publications</a>
+      <a href="#experience">Experience</a>
+      <a href="#awards">Awards</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle colour theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <button class="icon-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<nav class="drawer" id="drawer" aria-label="Mobile" aria-hidden="true">
+  <button class="close" id="closeBtn" type="button" aria-label="Close menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <a href="#research"><i>01</i>Research</a>
+  <a href="#publications"><i>02</i>Publications</a>
+  <a href="#experience"><i>03</i>Experience</a>
+  <a href="#awards"><i>04</i>Awards</a>
+  <a href="#skills"><i>05</i>Skills</a>
+  <a href="#contact"><i>06</i>Contact</a>
+</nav>
+
+<main id="main">
+<div id="top"></div>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="line"></span><span class="label">Undergraduate Researcher · Seoul</span></p>
+        <h1><span class="thin">Haein</span> <span class="strong">Seo</span></h1>
+        <p class="hangul">서해인</p>
+        <p class="lede">
+          I study how machines <b>see</b> and <b>read</b> the world — computer vision, 3D scene
+          understanding, and multimodal vision–language learning.
+        </p>
+        <p class="sub">
+          B.S. candidate in <b>Data Science</b> at <b>Duksung Women's University</b>
+          (Mar. 2024 – Feb. 2028, GPA 3.94/4.5 in major), and an undergraduate research assistant at the
+          <b>DMKD Lab</b> since January 2025. I am preparing for graduate study and would be glad to hear
+          from researchers working on related problems.
+        </p>
+        <div class="links">
+          <a class="lnk primary" href="CV_HaeinSeo.pdf" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3"/></svg>
+            Curriculum Vitae
+          </a>
+          <a class="lnk" href="mailto:angela040918@duksung.ac.kr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15"/><path d="M3 6.5l9 6.2 9-6.2"/></svg>
+            Email
+          </a>
+          <a class="lnk" href="https://scholar.google.com/citations?user=Mgr7VpkAAAAJ&amp;hl=en" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5L1.8 9 12 14.5 22.2 9 12 3.5z"/><path d="M5.6 11.2v4.6c0 1.8 2.9 3.2 6.4 3.2s6.4-1.4 6.4-3.2v-4.6"/></svg>
+            Google Scholar
+          </a>
+          <a class="lnk" href="https://www.linkedin.com/in/hae-in-seo-3278032bb/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9.5 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.03-3.06-1.9-3.06-1.9 0-2.2 1.45-2.2 2.96V21h-4z"/></svg>
+            LinkedIn
+          </a>
+          <a class="lnk" href="https://shiudangtang.tistory.com/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h11a4 4 0 0 1 4 4v11H8a4 4 0 0 1-4-4z"/><path d="M8 9.5h7M8 13.5h5"/></svg>
+            Research Blog
+          </a>
+        </div>
+      </div>
+
+      <div class="portrait">
+        <span class="frame" aria-hidden="true"></span>
+        <img src="assets/profile.jpg" alt="Portrait of Haein Seo" width="1281" height="1479">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <dl class="strip rv">
+    <div><dt>06</dt><dd>Peer-reviewed<br>publications</dd></div>
+    <div><dt>04</dt><dd>First-author<br>works</dd></div>
+    <div><dt>Best</dt><dd>Paper Award<br>ACK 2025</dd></div>
+    <div><dt>3<sup>rd</sup></dt><dd>Samsung AI Challenge<br>VRDU 2025</dd></div>
+  </dl>
+</div>
+
+<!-- ============ RESEARCH ============ -->
+<section id="research">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="label">01 — Research</span>
+      <h2>Three questions I keep <span class="accent">returning to</span></h2>
+    </div>
+    <div class="cards rv">
+      <article class="card">
+        <span class="rn">I</span>
+        <h3>Seeing in three dimensions</h3>
+        <p>Making perception robust where it is hardest — small objects, cluttered streets, incomplete depth. Detection, segmentation, and RGB-D / point-cloud representations for 3D scene understanding.</p>
+        <div class="tags"><span class="tag">Object Detection</span><span class="tag">Segmentation</span><span class="tag">RGB-D Fusion</span><span class="tag">Point Cloud</span></div>
+      </article>
+      <article class="card">
+        <span class="rn">II</span>
+        <h3>Language grounded in vision</h3>
+        <p>Vision–language models that reason over visually rich documents and turn pixels into structure: layout, semantics, and eventually action. Toward VLA systems that connect perception to decisions.</p>
+        <div class="tags"><span class="tag">VLM</span><span class="tag">VLA</span><span class="tag">Document Understanding</span><span class="tag">Multimodal</span></div>
+      </article>
+      <article class="card">
+        <span class="rn">III</span>
+        <h3>Knowledge that explains itself</h3>
+        <p>Retrieval, ontologies, and knowledge graphs as scaffolding for language models — so a prediction arrives with a reason a domain expert can check, from medicine to urban safety.</p>
+        <div class="tags"><span class="tag">LLM</span><span class="tag">RAG</span><span class="tag">Knowledge Graph</span><span class="tag">XAI</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PUBLICATIONS ============ -->
+<section id="publications">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="label">02 — Publications</span>
+      <h2>Journal articles &amp; <span class="accent">conference papers</span></h2>
+    </div>
+
+    <div class="pub-group rv">
+      <p class="pub-label">Journal Articles</p>
+      <article class="pub">
+        <span class="pub-idx">J 02</span>
+        <div>
+          <h3 class="pub-title">An Explainable Breast Cancer Diagnosis Framework using SAM-based Lesion Segmentation and VLM-based Semantic Interpretation</h3>
+          <p class="pub-meta">
+            <span class="au-me">Haein Seo</span>, Jehyeok Rew<br>
+            <span class="venue">Journal of Platform Technology</span>, vol. 14, no. 3, pp. 59–70, 2026.
+            <a href="https://doi.org/10.23023/JPT.2026.14.3.059" target="_blank" rel="noopener">doi:10.23023/JPT.2026.14.3.059</a>
+          </p>
+          <div class="badges"><span class="badge">First author</span><span class="badge plain">Medical Imaging · SAM · VLM · XAI</span></div>
+        </div>
+      </article>
+      <article class="pub">
+        <span class="pub-idx">J 01</span>
+        <div>
+          <h3 class="pub-title">Pedestrian Risk Area Analysis Using Street View-based Object Detection and Urban Spatial Information</h3>
+          <p class="pub-meta">
+            <span class="au-me">Haein Seo</span>, Eun-Chong Lee, Jehyeok Rew<br>
+            <span class="venue">The Transactions of the Korea Information Processing Society</span>, vol. 15, no. 8, pp. 681–695, 2026.
+          </p>
+          <div class="badges"><span class="badge">First author</span><span class="badge plain">Object Detection · Urban Analytics</span></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="pub-group rv">
+      <p class="pub-label">Conference Proceedings</p>
+      <article class="pub">
+        <span class="pub-idx">C 04</span>
+        <div>
+          <h3 class="pub-title">PRIME-K: A Multimodal Paper-to-Code Reconstruction Framework for Keystroke Dynamics Research</h3>
+          <p class="pub-meta">
+            <span class="au-me">H. Seo</span>, J. Rew<br>
+            <span class="venue">Proc. Korea Computer Congress (KCC)</span>, Republic of Korea, 2026, pp. 522–524.
+          </p>
+          <div class="badges"><span class="badge">First author</span><span class="badge plain">LLM · Code Generation</span></div>
+        </div>
+      </article>
+      <article class="pub">
+        <span class="pub-idx">C 03</span>
+        <div>
+          <h3 class="pub-title">CoDU: Multi-Stage Approach for Complex Document Structure Understanding</h3>
+          <p class="pub-meta">
+            K. Kim, M. Lee, <span class="au-me">H. Seo</span>, J. Rew<br>
+            <span class="venue">Proc. Korea Database Conference (KDBC)</span>, Gyeongju, Republic of Korea, Nov. 2025, pp. 167–170.
+          </p>
+          <div class="badges"><span class="badge plain">Document Understanding · VLM</span></div>
+        </div>
+      </article>
+      <article class="pub">
+        <span class="pub-idx">C 02</span>
+        <div>
+          <h3 class="pub-title">Hybrid clustering-prediction model and XAI analysis for severity stratification in malignant breast cancer patients</h3>
+          <p class="pub-meta">
+            <span class="au-me">H.-I. Seo</span>, S.-M. Seo, Y.-J. Lee, S.-H. Kim, J. Moon<br>
+            <span class="venue">Proc. ICT Platform Society Fall Conference</span>, Seongnam, South Korea, 2025, pp. 66–70.
+          </p>
+          <div class="badges"><span class="badge">First author</span><span class="badge plain">Clustering · XAI</span></div>
+        </div>
+      </article>
+      <article class="pub">
+        <span class="pub-idx">C 01</span>
+        <div>
+          <h3 class="pub-title">Pedestrian safety monitoring method using street view object detection and urban spatial information analysis</h3>
+          <p class="pub-meta">
+            <span class="au-me">H.-I. Seo</span>, E.-C. Lee, J. Rew<br>
+            <span class="venue">Proc. Annual Conference of KIPS (ACK)</span>, 2025, pp. 520–521.
+          </p>
+          <div class="badges"><span class="badge">First author</span><span class="badge">Best Paper Award</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPERIENCE ============ -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="label">03 — Experience</span>
+      <h2>Research at the <span class="accent">DMKD Lab</span></h2>
+    </div>
+    <div class="xp rv">
+      <div class="xp-side">
+        <p class="org">DMKD Lab</p>
+        <p class="role">Undergraduate Research Assistant</p>
+        <p class="when">Jan. 2025 – Present</p>
+        <p class="when">Duksung Women's University, Seoul</p>
+      </div>
+      <div>
+        <div class="xp-item">
+          <h3>Pedestrian-safety vision <em>· first author</em></h3>
+          <p>Designed and implemented a street-view object detection pipeline integrated with urban spatial information for pedestrian risk-area analysis — covering dataset annotation, preprocessing, and model fine-tuning. Published in a KIPS journal and presented at the KIPS Annual Conference, where it received the Best Paper Award.</p>
+        </div>
+        <div class="xp-item">
+          <h3>Explainable medical imaging <em>· first author</em></h3>
+          <p>Developed a breast cancer diagnosis framework combining SAM-based lesion segmentation with VLM-based semantic interpretation, together with an XAI-driven clustering and prediction model for severity stratification.</p>
+        </div>
+        <div class="xp-item">
+          <h3>Multimodal document &amp; code understanding</h3>
+          <p>Built VLM/LLM-based systems for complex document structure understanding (CoDU) and multimodal paper-to-code reconstruction (PRIME-K).</p>
+        </div>
+        <div class="xp-item">
+          <h3>Funded projects</h3>
+          <p>Contributed to an ETRI-commissioned AI image-editing software project and an NRF-funded research project, alongside model implementation, paper reviews, and lab seminars.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AWARDS ============ -->
+<section id="awards">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="label">04 — Recognition</span>
+      <h2>Awards, scholarships &amp; <span class="accent">activities</span></h2>
+    </div>
+    <div class="two rv">
+      <div>
+        <p class="col-title">Awards &amp; Honors</p>
+        <ul class="list">
+          <li><span class="what">Gold Prize, SNU FoodTech Commercialization Competition<span class="who">Seoul National University</span></span><span class="yr">Aug. 2026</span></li>
+          <li><span class="what">Grand Prize, Department of Data Science Academic Festival<span class="who">Duksung Women's University</span></span><span class="yr">Nov. 2025</span></li>
+          <li><span class="what">Best Paper Award, ACK 2025<span class="who">Annual Conference of KIPS</span></span><span class="yr">Nov. 2025</span></li>
+          <li><span class="what">Minister's Award, Ministry of Science and ICT<span class="who">Outreach SW Education Volunteer Group</span></span><span class="yr">Oct. 2025</span></li>
+          <li><span class="what">3rd Place, Samsung AI Challenge<span class="who">Visually-rich Document Understanding</span></span><span class="yr">Oct. 2025</span></li>
+        </ul>
+      </div>
+      <div>
+        <p class="col-title">Scholarships &amp; Certification</p>
+        <ul class="list">
+          <li><span class="what">KT Digital Talent Scholarship<span class="who">KT · Mar. – Aug. 2026</span></span><span class="yr">2026</span></li>
+          <li><span class="what">Academic Excellence Scholarship<span class="who">1st in Department, 1st Sem. 2024 (GPA 4.25/4.5)</span></span><span class="yr">2024</span></li>
+          <li><span class="what">Academic Excellence Scholarship<span class="who">Top 10%, 2nd Sem. 2024 (GPA 4.17/4.5)</span></span><span class="yr">2024</span></li>
+          <li><span class="what">Google Analytics Certification<span class="who">Google</span></span><span class="yr">2024</span></li>
+        </ul>
+        <p class="col-title" style="margin-top:38px">Leadership &amp; Activities</p>
+        <ul class="list">
+          <li><span class="what">AI Team, KT Social Problem-Solving Project<span class="who">KT</span></span><span class="yr">2026</span></li>
+          <li><span class="what">Team Lead, Outreach SW Education Volunteer Group<span class="who">Code Club, Korea</span></span><span class="yr">2025</span></li>
+          <li><span class="what">Cooperation Team, University Career Supporters<span class="who">Career Development Center, Duksung Women's Univ.</span></span><span class="yr">2024–25</span></li>
+          <li><span class="what">SW Education Mentor<span class="who">Shinsegae I&amp;C &amp; KOFAC Coding Programs</span></span><span class="yr">2024</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="label">05 — Toolkit</span>
+      <h2>Technical <span class="accent">skills</span></h2>
+    </div>
+    <div class="skills rv">
+      <div class="skill-row"><h3>Programming &amp; ML Frameworks</h3><p>Python, C, PyTorch, TensorFlow, scikit-learn</p></div>
+      <div class="skill-row"><h3>Statistical &amp; Time-Series Analysis</h3><p>statsmodels, Pandas, NumPy, Matplotlib</p></div>
+      <div class="skill-row"><h3>Computer Vision &amp; 3D Vision</h3><p>Object detection, small-object detection, image segmentation, SAM-based segmentation, RGB-D processing, point cloud processing &amp; completion, 3D scene understanding, visual representation learning</p></div>
+      <div class="skill-row"><h3>Multimodal &amp; Vision-Language AI</h3><p>Multimodal learning, vision–language models (VLMs), vision–language reasoning, document understanding, multimodal document analysis, LLM, RAG, explainable AI (XAI)</p></div>
+      <div class="skill-row"><h3>Development &amp; Research Tools</h3><p>Git, Docker, Ubuntu/Linux, Hugging Face, CUDA, Overleaf</p></div>
+      <div class="skill-row"><h3>Model Serving &amp; Local Inference</h3><p>vLLM, Ollama, OpenClaw</p></div>
+    </div>
+    <p class="coursework rv">
+      Relevant coursework — Introduction to Machine Learning (A+), Introduction to Deep Learning (A+),
+      Big Data Visualization (A+), Data Processing (A+), Big Data Collection &amp; Information Retrieval (A+),
+      Introduction to Big Data (A+).
+    </p>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="contact">
+  <div class="wrap">
+    <div class="contact-grid rv">
+      <div>
+        <span class="label">06 — Contact</span>
+        <h2 style="margin-top:12px">Get in touch</h2>
+        <p class="say">
+          I am preparing for graduate study in computer vision and multimodal learning, and I am always happy
+          to discuss research, collaborations, or reading recommendations. The fastest way to reach me is email.
+        </p>
+        <a class="mail" href="mailto:angela040918@duksung.ac.kr">angela040918@duksung.ac.kr</a>
+        <div class="links">
+          <a class="lnk" href="CV_HaeinSeo.pdf" target="_blank" rel="noopener">Curriculum Vitae</a>
+          <a class="lnk" href="https://scholar.google.com/citations?user=Mgr7VpkAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar</a>
+          <a class="lnk" href="https://www.linkedin.com/in/hae-in-seo-3278032bb/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="lnk" href="https://shiudangtang.tistory.com/" target="_blank" rel="noopener">Blog</a>
+        </div>
+      </div>
+      <img class="mascot" src="assets/icon-512.png" alt="" width="512" height="512">
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© <span id="yr">2026</span> HAEIN SEO · DATA SCIENCE, DUKSUNG WOMEN'S UNIVERSITY</p>
+    <a class="to-top" href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Person",
+  "name":"Haein Seo",
+  "alternateName":"서해인",
+  "email":"mailto:angela040918@duksung.ac.kr",
+  "jobTitle":"Undergraduate Research Assistant",
+  "affiliation":{"@type":"CollegeOrUniversity","name":"Duksung Women's University"},
+  "knowsAbout":["Computer Vision","3D Scene Understanding","Multimodal Learning","Vision-Language Models","Explainable AI"],
+  "sameAs":[
+    "https://scholar.google.com/citations?user=Mgr7VpkAAAAJ&hl=en",
+    "https://www.linkedin.com/in/hae-in-seo-3278032bb/",
+    "https://shiudangtang.tistory.com/"
+  ]
+}
+</script>
+
+<script>
+(function(){
+  var root=document.documentElement;
+
+  /* theme */
+  try{ var saved=localStorage.getItem('theme'); if(saved) root.setAttribute('data-theme',saved); }catch(e){}
+  document.getElementById('themeBtn').addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur) cur = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var next = cur==='dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme',next);
+    try{ localStorage.setItem('theme',next); }catch(e){}
+  });
+
+  document.getElementById('yr').textContent=new Date().getFullYear();
+
+  /* sticky rule */
+  var bar=document.getElementById('topbar');
+  addEventListener('scroll',function(){ bar.classList.toggle('is-stuck', scrollY>8); },{passive:true});
+
+  /* mobile drawer */
+  var drawer=document.getElementById('drawer'),
+      menuBtn=document.getElementById('menuBtn'),
+      closeBtn=document.getElementById('closeBtn');
+  function setMenu(open){
+    drawer.classList.toggle('open',open);
+    drawer.setAttribute('aria-hidden', open?'false':'true');
+    menuBtn.setAttribute('aria-expanded', open?'true':'false');
+    document.body.classList.toggle('locked',open);
+  }
+  menuBtn.addEventListener('click',function(){ setMenu(true); });
+  closeBtn.addEventListener('click',function(){ setMenu(false); });
+  [].forEach.call(drawer.querySelectorAll('a'),function(a){
+    a.addEventListener('click',function(){ setMenu(false); });
+  });
+  addEventListener('keydown',function(e){ if(e.key==='Escape') setMenu(false); });
+  var mq=matchMedia('(min-width: 901px)'), onMq=function(e){ if(e.matches) setMenu(false); };
+  if(mq.addEventListener) mq.addEventListener('change',onMq); else if(mq.addListener) mq.addListener(onMq);
+
+  /* reveal */
+  var els=document.querySelectorAll('.rv');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    },{rootMargin:'0px 0px -8% 0px',threshold:.06});
+    [].forEach.call(els,function(el){ io.observe(el); });
+  } else { [].forEach.call(els,function(el){ el.classList.add('in'); }); }
+
+  /* scroll spy */
+  var secs=[].slice.call(document.querySelectorAll('section[id]')), links={};
+  [].forEach.call(document.querySelectorAll('.nav a[href^="#"]'),function(a){ links[a.getAttribute('href').slice(1)]=a; });
+  function spy(){
+    var y=scrollY+130, cur=null;
+    secs.forEach(function(s){ if(s.offsetTop<=y) cur=s.id; });
+    for(var k in links) links[k].classList.toggle('active', k===cur);
+  }
+  addEventListener('scroll',spy,{passive:true}); spy();
+})();
+</script>
+</body>
+</html>
